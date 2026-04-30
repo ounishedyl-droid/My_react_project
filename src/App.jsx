@@ -1,7 +1,8 @@
-// Hacker News style data (GLOBAL as required by lab)
-const stories = [
+import { useState, useEffect } from "react";
+
+const initialStories = [
   {
-    objectID: "1",
+    objectID: 1,
     title: "React is awesome",
     url: "https://react.dev",
     author: "Dan Abramov",
@@ -9,7 +10,7 @@ const stories = [
     num_comments: 20,
   },
   {
-    objectID: "2",
+    objectID: 2,
     title: "Vite is fast",
     url: "https://vitejs.dev",
     author: "Evan You",
@@ -18,23 +19,7 @@ const stories = [
   },
 ];
 
-// Header Component
-function Header() {
-  return <h1>Hacker News App</h1>;
-}
-
-// Search Component (UI only for now)
-function Search() {
-  return (
-    <div>
-      <label htmlFor="search">Search: </label>
-      <input id="search" type="text" />
-    </div>
-  );
-}
-
-// List Component (renders stories)
-function List() {
+function List({ stories }) {
   return (
     <div>
       {stories.map((story) => (
@@ -53,13 +38,38 @@ function List() {
   );
 }
 
-// Main App Component
-function App() {
+function Search({ searchTerm, onSearch }) {
   return (
     <div>
-      <Header />
-      <Search />
-      <List />
+      <label htmlFor="search">Search:</label>
+      <input
+        id="search"
+        type="text"
+        value={searchTerm}
+        onChange={(e) => onSearch(e.target.value)}
+      />
+    </div>
+  );
+}
+
+function App() {
+  const [searchTerm, setSearchTerm] = useState(
+    localStorage.getItem("search") || ""
+  );
+
+  useEffect(() => {
+    localStorage.setItem("search", searchTerm);
+  }, [searchTerm]);
+
+  const filteredStories = initialStories.filter((story) =>
+    story.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div>
+      <h1>Hacker News App</h1>
+      <Search searchTerm={searchTerm} onSearch={setSearchTerm} />
+      <List stories={filteredStories} />
     </div>
   );
 }
