@@ -5,17 +5,12 @@ function Header() {
   return <h1>Hacker News App</h1>;
 }
 
-/* ---------------- REUSABLE INPUT (COMPOSITION) ---------------- */
-function InputWithLabel({ id, type = "text", value, onInputChange, children }) {
+/* ---------------- INPUT ---------------- */
+function InputWithLabel({ id, value, onInputChange, children }) {
   return (
     <div>
       <label htmlFor={id}>{children}</label>
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={onInputChange}
-      />
+      <input id={id} value={value} onChange={onInputChange} />
     </div>
   );
 }
@@ -34,9 +29,7 @@ function Item({ story, onRemove }) {
       <p>{story.points} points</p>
       <p>{story.num_comments} comments</p>
 
-      <button onClick={() => onRemove(story.objectID)}>
-        Delete
-      </button>
+      <button onClick={() => onRemove(story.objectID)}>Delete</button>
     </div>
   );
 }
@@ -46,11 +39,7 @@ function List({ stories, onRemove }) {
   return (
     <div>
       {stories.map((story) => (
-        <Item
-          key={story.objectID}
-          story={story}
-          onRemove={onRemove}
-        />
+        <Item key={story.objectID} story={story} onRemove={onRemove} />
       ))}
     </div>
   );
@@ -58,47 +47,45 @@ function List({ stories, onRemove }) {
 
 /* ---------------- APP ---------------- */
 function App() {
-  const initialStories = [
-    {
-      objectID: "1",
-      title: "React is awesome",
-      url: "https://react.dev",
-      author: "Dan Abramov",
-      points: 100,
-      num_comments: 20,
-    },
-    {
-      objectID: "2",
-      title: "Vite is fast",
-      url: "https://vitejs.dev",
-      author: "Evan You",
-      points: 80,
-      num_comments: 10,
-    },
-  ];
+  const API_URL = "https://hn.algolia.com/api/v1/search?query=";
 
-  const [stories, setStories] = useState(initialStories);
-
+  const [stories, setStories] = useState([]);
   const [searchTerm, setSearchTerm] = useState(
     localStorage.getItem("search") || ""
   );
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+
+  /* SAVE SEARCH TERM */
   useEffect(() => {
     localStorage.setItem("search", searchTerm);
   }, [searchTerm]);
 
-  /* ---------------- REMOVE FUNCTION ---------------- */
-  const handleRemoveStory = (id) => {
-    const filteredStories = stories.filter(
-      (story) => story.objectID !== id
-    );
-    setStories(filteredStories);
-  };
+  /* FETCH DATA */
+  useEffect(() => {
+    if (!searchTerm) return;
 
-  /* ---------------- FILTER ---------------- */
-  const filteredStories = stories.filter((story) =>
-    story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    setIsLoading(true);
+    setIsError(false);
+
+    fetch(API_URL + searchTerm)
+      .then((res) => res.json())
+      .then((data) => {
+        setStories(data.hits);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsError(true);
+        setIsLoading(false);
+      });
+  }, [searchTerm]);
+
+  /* DELETE STORY */
+  const handleRemoveStory = (id) => {
+    const updated = stories.filter((story) => story.objectID !== id);
+    setStories(updated);
+  };
 
   return (
     <div>
@@ -109,10 +96,16 @@ function App() {
         value={searchTerm}
         onInputChange={(e) => setSearchTerm(e.target.value)}
       >
-        <strong>Search:</strong>
+        Search:
       </InputWithLabel>
 
-      <List stories={filteredStories} onRemove={handleRemoveStory} />
+      {isError && <p>Something went wrong...</p>}
+
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <List stories={stories} onRemove={handleRemoveStory} />
+      )}
     </div>
   );
 }
