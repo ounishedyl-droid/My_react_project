@@ -1,55 +1,43 @@
 const stories = [
   {
-    objectID: "1",
+    objectID: 1,
     title: "React is awesome",
-    url: "https://react.dev",
     author: "Dan",
-    points: 100,
-    num_comments: 20
   },
   {
-    objectID: "2",
-    title: "Vite makes dev fast",
-    url: "https://vitejs.dev",
+    objectID: 2,
+    title: "Vite is fast",
     author: "Evan",
-    points: 85,
-    num_comments: 12
   }
 ];
 
-function Header() {
-  return <h2>🔥 My Hacker News App</h2>;
-}
+const Header = () => {
+  return <h1>Hacker News App</h1>;
+};
 
-function Search() {
+const Search = () => {
+  const handleChange = (event) => {
+    console.log(event.target.value);
+    console.log("Typing...");
+  };
+
   return (
     <div>
       <label htmlFor="search">Search:</label>
-      <input type="text" id="search" />
+      <input type="text" onChange={handleChange} />
     </div>
   );
-}
+};
 
-function List() {
-  return (
-    <div>
-      {stories.map((story) => (
-        <div key={story.objectID}>
-          <h3>
-            <a href={story.url} target="_blank" rel="noreferrer">
-              {story.title}
-            </a>
-          </h3>
-          <p>Author: {story.author}</p>
-          <p>Points: {story.points}</p>
-          <p>Comments: {story.num_comments}</p>
-        </div>
-      ))}
+const List = () =>
+  stories.map((story) => (
+    <div key={story.objectID}>
+      <h3>{story.title}</h3>
+      <p>{story.author}</p>
     </div>
-  );
-}
+  ));
 
-function App() {
+const App = () => {
   return (
     <div>
       <Header />
@@ -57,18 +45,13 @@ function App() {
       <List />
     </div>
   );
-}
+};
 
 export default App;
-
 /*
-STEP 4 REFLECTION:
+1. Concise arrow functions are used when we return one expression.
 
-1. App now only organizes components and does not contain UI logic.
+2. Block body arrow functions are used when we need logic before return.
 
-2. List is responsible for rendering the stories.
-
-3. Search handles only the input UI.
-
-4. This structure is cleaner because each component has a single responsibility.
+3. Event objects contain information about the interaction, including input value.
 */
