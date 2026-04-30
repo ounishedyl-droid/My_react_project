@@ -18,6 +18,7 @@ function App() {
       <h1>My First React Component </h1>
 
       <p>Student name: {studentName}</p>
+
       <p>Course: {courseTitle}</p>
 
       <h2>Welcome to {courseTitle}, {studentName}!</h2>
@@ -29,6 +30,7 @@ function App() {
       <p>Age: {student.age}</p>
       <p>Track: {student.track}</p>
 
+      {/* ✅ STEP 7 */}
       <p>{sayHello()}</p>
     </div>
   );
