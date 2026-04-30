@@ -1,57 +1,74 @@
-const stories = [
-  {
-    objectID: 1,
-    title: "React is awesome",
-    author: "Dan",
-  },
-  {
-    objectID: 2,
-    title: "Vite is fast",
-    author: "Evan",
-  }
-];
+import { useState } from "react";
 
-const Header = () => {
-  return <h1>Hacker News App</h1>;
-};
-
-const Search = () => {
-  const handleChange = (event) => {
-    console.log(event.target.value);
-    console.log("Typing...");
-  };
-
+const List = ({ stories }) => {
   return (
     <div>
-      <label htmlFor="search">Search:</label>
-      <input type="text" onChange={handleChange} />
+      {stories.map((story) => (
+        <div key={story.objectID}>
+          <h3>
+            <a href={story.url}>{story.title}</a>
+          </h3>
+          <p>{story.author}</p>
+          <p>{story.points} points</p>
+          <p>{story.num_comments} comments</p>
+        </div>
+      ))}
     </div>
   );
 };
 
-const List = () =>
-  stories.map((story) => (
-    <div key={story.objectID}>
-      <h3>{story.title}</h3>
-      <p>{story.author}</p>
-    </div>
-  ));
-
-const App = () => {
+const Search = ({ searchTerm, setSearchTerm }) => {
   return (
     <div>
-      <Header />
-      <Search />
-      <List />
+      <label htmlFor="search">Search:</label>
+      <input
+        id="search"
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+    </div>
+  );
+};
+
+const App = () => {
+  const stories = [
+    {
+      objectID: 1,
+      title: "React is awesome",
+      url: "https://react.dev",
+      author: "Dan Abramov",
+      points: 100,
+      num_comments: 20
+    },
+    {
+      objectID: 2,
+      title: "Vite is fast",
+      url: "https://vitejs.dev",
+      author: "Evan You",
+      points: 80,
+      num_comments: 10
+    }
+  ];
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredStories = stories.filter((story) =>
+    story.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div>
+      <h1>Hacker News App</h1>
+
+      <Search
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
+
+      <List stories={filteredStories} />
     </div>
   );
 };
 
 export default App;
-/*
-1. Concise arrow functions are used when we return one expression.
-
-2. Block body arrow functions are used when we need logic before return.
-
-3. Event objects contain information about the interaction, including input value.
-*/
